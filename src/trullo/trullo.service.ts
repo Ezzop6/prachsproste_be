@@ -35,8 +35,9 @@ export class TrulloService {
     return card;
   }
 
-  findAllBoards(): Promise<Board[]> {
-    return this.boardRepository.find({ relations: ['cards'] });
+  async findAllBoards(): Promise<Board[]> {
+    const boards = await this.boardRepository.find({ relations: ['cards'] });
+    return this.sortBoardByDate(boards);
   }
 
   async findOneBoard(id: string): Promise<Board> {
@@ -94,5 +95,14 @@ export class TrulloService {
       await this.deleteBoard(board.id);
     }
     return HttpStatus.NO_CONTENT;
+  }
+
+  sortBoardByDate(boards: Board[], ascending: boolean = true): Board[] {
+    return boards.sort((a, b) => {
+      if (ascending) {
+        return a.createdAt.getTime() - b.createdAt.getTime();
+      }
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    });
   }
 }

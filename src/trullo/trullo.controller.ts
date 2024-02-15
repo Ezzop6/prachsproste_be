@@ -17,8 +17,8 @@ export class TrulloController {
   @ApiOperation({
     summary: 'Get all boards',
   })
-  findAllBoards(): Promise<Board[]> {
-    return this.trulloService.findAllBoards();
+  async findAllBoards(): Promise<Board[]> {
+    return await this.trulloService.findAllBoards();
   }
 
   @Post()
@@ -34,16 +34,16 @@ export class TrulloController {
   @ApiOperation({
     summary: 'Get a board by id',
   })
-  findOneBoard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Board> {
-    return this.trulloService.findOneBoard(id);
+  async findOneBoard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Board> {
+    return await this.trulloService.findOneBoard(id);
   }
 
   @Get('card/:id')
   @ApiOperation({
     summary: 'Get a card by id',
   })
-  findOneCard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Card> {
-    return this.trulloService.findOneCard(id);
+  async findOneCard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Card> {
+    return await this.trulloService.findOneCard(id);
   }
 
   @Post('board/:id')

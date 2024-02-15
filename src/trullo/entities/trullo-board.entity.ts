@@ -13,6 +13,9 @@ export class Board {
   @OneToMany(() => Card, (card) => card.board, { cascade: true })
   cards: Card[];
 
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
   @Column()
   title: string;
 }
