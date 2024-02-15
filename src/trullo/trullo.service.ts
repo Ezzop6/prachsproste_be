@@ -86,4 +86,13 @@ export class TrulloService {
     }
     return HttpStatus.NO_CONTENT;
   }
+
+  // TODO: Delete after testing
+  async deleteAllBoards(): Promise<HttpStatus> {
+    const boards = await this.findAllBoards();
+    for (const board of boards) {
+      await this.deleteBoard(board.id);
+    }
+    return HttpStatus.NO_CONTENT;
+  }
 }
