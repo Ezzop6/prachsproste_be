@@ -4,6 +4,7 @@ import { appConfig } from 'config/appConfig';
 import { typeOrmConfig } from 'config/typeOrmConfig.config';
 import { ApiSwagger } from './app.api-swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { corsConfig } from 'config/corsConfig';
 
 if (appConfig.env !== 'development' && typeOrmConfig.synchronize === true) {
   throw new Error('You cannot use synchronize in production');
@@ -19,6 +20,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.enableCors(corsConfig);
   await app.listen(appConfig.port);
   console.log(`Application is in ${appConfig.env} mode`);
   console.log(`Application is running on: ${await app.getUrl()}`);
