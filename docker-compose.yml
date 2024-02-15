@@ -1,5 +1,22 @@
 version: '3'
 services:
+  app:
+    user: '1000:1000'
+
+    build: .
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - ./:/src
+      - ./node_modules:/node_modules
+    networks:
+      - app-net
+    depends_on:
+      - db
+
   db:
     image: postgres
     restart: always
@@ -15,5 +32,11 @@ services:
     volumes:
       - local_pgdata:/var/lib/postgresql/data
 
+    networks:
+      - app-net
+
 volumes:
   local_pgdata:
+
+networks:
+  app-net:
