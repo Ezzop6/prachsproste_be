@@ -7,6 +7,7 @@ import { Trullo } from './entities/trullo.entity';
 import { Board } from './entities/trullo-board.entity';
 import { Card } from './entities/trullo-card.entity';
 import { CreateTrulloCardDto } from './dto/create-trullo-card.dto';
+import { UpdateTrulloCardDto } from './dto/update-trullo-card.dto';
 
 @Injectable()
 export class TrulloService {
@@ -46,10 +47,24 @@ export class TrulloService {
     return find;
   }
 
-  async updateBoard(id: string, updateTrulloDto: UpdateTrulloBoardDto): Promise<Board> {
+  async findOneCard(id: string): Promise<Card> {
+    const find = await this.cardRepository.findOne({ where: { id } });
+    if (!find) {
+      throw new NotFoundException(`Card with id ${id} not found`);
+    }
+    return find;
+  }
+
+  async updateBoard(id: string, updateTrulloBoardDto: UpdateTrulloBoardDto): Promise<Board> {
     const board = await this.findOneBoard(id);
-    const updatedBoard = Object.assign(board, updateTrulloDto);
+    const updatedBoard = Object.assign(board, updateTrulloBoardDto);
     return await this.boardRepository.save(updatedBoard);
+  }
+
+  async updateCard(id: string, updateTrulloDto: UpdateTrulloCardDto): Promise<Card> {
+    const card = await this.findOneCard(id);
+    const updatedCard = Object.assign(card, updateTrulloDto);
+    return await this.cardRepository.save(updatedCard);
   }
 
   async deleteBoard(id: string): Promise<HttpStatus> {
@@ -59,6 +74,15 @@ export class TrulloService {
 
     if (!deleted) {
       throw new NotFoundException(`Board with id ${id} not found`);
+    }
+    return HttpStatus.NO_CONTENT;
+  }
+  async deleteCard(id: string): Promise<HttpStatus> {
+    const card = await this.findOneCard(id);
+    const deleted = await this.cardRepository.remove(card);
+
+    if (!deleted) {
+      throw new NotFoundException(`Card with id ${id} not found`);
     }
     return HttpStatus.NO_CONTENT;
   }
