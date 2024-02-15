@@ -3,9 +3,11 @@ import { TrulloService } from './trullo.service';
 import { TrulloController } from './trullo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Trullo } from './entities/trullo.entity';
+import { Board } from './entities/trullo-board.entity';
+import { Card } from './entities/trullo-card.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Trullo])],
+  imports: [TypeOrmModule.forFeature([Trullo, Board, Card])],
   controllers: [TrulloController],
   providers: [TrulloService],
 })

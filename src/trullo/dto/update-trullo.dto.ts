@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateTrulloDto } from './create-trullo.dto';
+import { CreateTrulloBoardDto } from './create-trullo-board.dto';
 
-export class UpdateTrulloDto extends PartialType(CreateTrulloDto) {}
+export class UpdateTrulloBoardDto extends PartialType(CreateTrulloBoardDto) {}
