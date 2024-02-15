@@ -1,0 +1,11 @@
+db:
+  username: postgres
+  password: postgres
+  type: postgres
+  port: 5432
+  dbName: dev_db
+  synchronize: true
+
+app:
+  port: 3000
+  NODE_ENV: development
