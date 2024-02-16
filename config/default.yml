@@ -14,3 +14,8 @@ cors:
   allowedOrigins: localhost
   methods: GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS
   allowedHeaders: Content-Type, Accept, Origin, Access-Control-Allow-Headers
+
+jwt:
+  secret: secret
+  expiresIn: 2592000
+  defaultStrategy: jwt

@@ -1,2 +1,7 @@
 db:
   host: localhost
+
+jwt:
+  secret: SuperSecret
+  # expiresIn: 604800
+  expiresIn: 120
