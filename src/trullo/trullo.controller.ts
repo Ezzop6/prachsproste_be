@@ -2,11 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode
 import { TrulloService } from './trullo.service';
 import { CreateTrulloBoardDto } from './dto/create-trullo-board.dto';
 import { UpdateTrulloBoardDto } from './dto/update-trullo.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Board } from './entities/trullo-board.entity';
 import { CreateTrulloCardDto } from './dto/create-trullo-card.dto';
 import { Card } from './entities/trullo-card.entity';
 import { UpdateTrulloCardDto } from './dto/update-trullo-card.dto';
+import { UUID } from 'crypto';
+import { SchemaBoard, SchemaBoardEmpty } from './api/board-schema';
+import { SchemaCard } from './api/card-schema';
 
 @ApiTags('trullo')
 @Controller('trullo')
@@ -14,43 +17,36 @@ export class TrulloController {
   constructor(private readonly trulloService: TrulloService) {}
 
   @Get()
-  @ApiOperation({
-    summary: 'Get all boards',
-  })
+  @ApiOperation({ summary: 'Get all boards' })
+  @ApiCreatedResponse({ type: SchemaBoard, isArray: true })
   async findAllBoards(): Promise<Board[]> {
     return await this.trulloService.findAllBoards();
   }
 
   @Post()
-  @ApiOperation({
-    summary: 'Board successfully created.',
-  })
-  @ApiResponse({ status: 201, description: 'Board successfully created.' })
+  @ApiOperation({ summary: 'Create a new board' })
+  @ApiResponse({ status: 201, description: 'There is no card yet.', type: SchemaBoardEmpty })
   async createBoard(@Body() createTrulloDto: CreateTrulloBoardDto): Promise<Board> {
     return await this.trulloService.createBoard(createTrulloDto);
   }
 
   @Get(':id')
-  @ApiOperation({
-    summary: 'Get a board by id',
-  })
+  @ApiOperation({ summary: 'Get a board by id' })
+  @ApiResponse({ status: 200, description: 'Board successfully found.', type: SchemaBoard })
   async findOneBoard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Board> {
     return await this.trulloService.findOneBoard(id);
   }
 
   @Get('card/:id')
-  @ApiOperation({
-    summary: 'Get a card by id',
-  })
+  @ApiOperation({ summary: 'Get a card by id' })
+  @ApiResponse({ status: 200, description: 'Card successfully found.', type: SchemaCard })
   async findOneCard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Card> {
     return await this.trulloService.findOneCard(id);
   }
 
   @Post('board/:id')
-  @ApiOperation({
-    summary: 'Create a new card',
-  })
-  @ApiResponse({ status: 201, description: 'Card successfully created.' })
+  @ApiOperation({ summary: 'Create a new card' })
+  @ApiResponse({ status: 201, description: 'Card successfully created.', type: SchemaCard })
   async createCard(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() createCardDto: CreateTrulloCardDto,
@@ -59,23 +55,19 @@ export class TrulloController {
   }
 
   @Patch(':id')
-  @ApiOperation({
-    summary: 'Update a board',
-  })
-  @ApiResponse({ status: 200, description: 'Board successfully updated.' })
+  @ApiOperation({ summary: 'Update a board' })
+  @ApiResponse({ status: 200, description: 'Board successfully updated.', type: SchemaBoard })
   @ApiResponse({ status: 404, description: 'Board not found.' })
   async updateBoard(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('id', new ParseUUIDPipe()) id: UUID,
     @Body() updateTrulloBoardDto: UpdateTrulloBoardDto,
   ): Promise<Board> {
     return await this.trulloService.updateBoard(id, updateTrulloBoardDto);
   }
 
   @Patch('card/:id')
-  @ApiOperation({
-    summary: 'Update a card',
-  })
-  @ApiResponse({ status: 200, description: 'Card successfully updated.' })
+  @ApiOperation({ summary: 'Update a card' })
+  @ApiResponse({ status: 200, description: 'Card successfully updated.', type: SchemaCard })
   @ApiResponse({ status: 404, description: 'Card not found.' })
   async updateCard(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -85,9 +77,7 @@ export class TrulloController {
   }
 
   @Delete(':id')
-  @ApiOperation({
-    summary: 'Delete a board with all cards',
-  })
+  @ApiOperation({ summary: 'Delete a board with all cards' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({ status: 204, description: 'Board successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Board not found.' })
@@ -96,9 +86,7 @@ export class TrulloController {
   }
 
   @Delete('card/:id')
-  @ApiOperation({
-    summary: 'Delete a card',
-  })
+  @ApiOperation({ summary: 'Delete a card' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({ status: 204, description: 'Card successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Card not found.' })
@@ -107,9 +95,7 @@ export class TrulloController {
   }
 
   @Delete()
-  @ApiOperation({
-    summary: 'Delete all boards only for testing',
-  })
+  @ApiOperation({ summary: 'Delete all boards only for testing' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({ status: 204, description: 'All boards successfully deleted.' })
   async deleteAllBoards(): Promise<HttpStatus> {
