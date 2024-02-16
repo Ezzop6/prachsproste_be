@@ -8,6 +8,7 @@ import { Board } from './entities/trullo-board.entity';
 import { Card } from './entities/trullo-card.entity';
 import { CreateTrulloCardDto } from './dto/create-trullo-card.dto';
 import { UpdateTrulloCardDto } from './dto/update-trullo-card.dto';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class TrulloService {
@@ -27,7 +28,7 @@ export class TrulloService {
     return await this.boardRepository.save(board);
   }
 
-  async createCard(id: string, createTrulloDto: CreateTrulloCardDto): Promise<Card> {
+  async createCard(id: UUID, createTrulloDto: CreateTrulloCardDto): Promise<Card> {
     const board = await this.findOneBoard(id);
     const card = this.cardRepository.create(createTrulloDto);
     board.cards.push(card);
@@ -37,18 +38,21 @@ export class TrulloService {
 
   async findAllBoards(): Promise<Board[]> {
     const boards = await this.boardRepository.find({ relations: ['cards'] });
-    return this.sortBoardByDate(boards);
+    const sortedBoards = this.sortBoardByDate(boards);
+    const sortedCards = sortedBoards.map((board) => this.sortCardByDate(board.cards));
+    return sortedBoards.map((board, index) => ({ ...board, cards: sortedCards[index] }));
   }
 
-  async findOneBoard(id: string): Promise<Board> {
+  async findOneBoard(id: UUID): Promise<Board> {
     const find = await this.boardRepository.findOne({ where: { id }, relations: ['cards'] });
     if (!find) {
       throw new NotFoundException(`Board with id ${id} not found`);
     }
-    return find;
+    const sortedCards = this.sortCardByDate(find.cards);
+    return { ...find, cards: sortedCards };
   }
 
-  async findOneCard(id: string): Promise<Card> {
+  async findOneCard(id: UUID): Promise<Card> {
     const find = await this.cardRepository.findOne({ where: { id } });
     if (!find) {
       throw new NotFoundException(`Card with id ${id} not found`);
@@ -56,19 +60,19 @@ export class TrulloService {
     return find;
   }
 
-  async updateBoard(id: string, updateTrulloBoardDto: UpdateTrulloBoardDto): Promise<Board> {
+  async updateBoard(id: UUID, updateTrulloBoardDto: UpdateTrulloBoardDto): Promise<Board> {
     const board = await this.findOneBoard(id);
     const updatedBoard = Object.assign(board, updateTrulloBoardDto);
     return await this.boardRepository.save(updatedBoard);
   }
 
-  async updateCard(id: string, updateTrulloDto: UpdateTrulloCardDto): Promise<Card> {
+  async updateCard(id: UUID, updateTrulloDto: UpdateTrulloCardDto): Promise<Card> {
     const card = await this.findOneCard(id);
     const updatedCard = Object.assign(card, updateTrulloDto);
     return await this.cardRepository.save(updatedCard);
   }
 
-  async deleteBoard(id: string): Promise<HttpStatus> {
+  async deleteBoard(id: UUID): Promise<HttpStatus> {
     const board = await this.findOneBoard(id);
     await this.cardRepository.remove(board.cards);
     const deleted = await this.boardRepository.remove(board);
@@ -78,7 +82,7 @@ export class TrulloService {
     }
     return HttpStatus.NO_CONTENT;
   }
-  async deleteCard(id: string): Promise<HttpStatus> {
+  async deleteCard(id: UUID): Promise<HttpStatus> {
     const card = await this.findOneCard(id);
     const deleted = await this.cardRepository.remove(card);
 
@@ -99,6 +103,14 @@ export class TrulloService {
 
   sortBoardByDate(boards: Board[], ascending: boolean = true): Board[] {
     return boards.sort((a, b) => {
+      if (ascending) {
+        return a.createdAt.getTime() - b.createdAt.getTime();
+      }
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    });
+  }
+  sortCardByDate(cards: Card[], ascending: boolean = true): Card[] {
+    return cards.sort((a, b) => {
       if (ascending) {
         return a.createdAt.getTime() - b.createdAt.getTime();
       }

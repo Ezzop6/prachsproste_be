@@ -1,10 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Board } from './trullo-board.entity';
+import { UUID } from 'crypto';
 
 @Entity()
 export class Card {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: UUID;
 
   @ManyToOne(() => Board, (board) => board.cards)
   board: Board;

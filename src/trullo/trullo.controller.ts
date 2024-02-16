@@ -33,14 +33,14 @@ export class TrulloController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a board by id' })
   @ApiResponse({ status: 200, description: 'Board successfully found.', type: SchemaBoard })
-  async findOneBoard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Board> {
+  async findOneBoard(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<Board> {
     return await this.trulloService.findOneBoard(id);
   }
 
   @Get('card/:id')
   @ApiOperation({ summary: 'Get a card by id' })
   @ApiResponse({ status: 200, description: 'Card successfully found.', type: SchemaCard })
-  async findOneCard(@Param('id', new ParseUUIDPipe()) id: string): Promise<Card> {
+  async findOneCard(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<Card> {
     return await this.trulloService.findOneCard(id);
   }
 
@@ -48,7 +48,7 @@ export class TrulloController {
   @ApiOperation({ summary: 'Create a new card' })
   @ApiResponse({ status: 201, description: 'Card successfully created.', type: SchemaCard })
   async createCard(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('id', new ParseUUIDPipe()) id: UUID,
     @Body() createCardDto: CreateTrulloCardDto,
   ): Promise<Card> {
     return await this.trulloService.createCard(id, createCardDto);
@@ -70,7 +70,7 @@ export class TrulloController {
   @ApiResponse({ status: 200, description: 'Card successfully updated.', type: SchemaCard })
   @ApiResponse({ status: 404, description: 'Card not found.' })
   async updateCard(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('id', new ParseUUIDPipe()) id: UUID,
     @Body() updateTrulloCardDto: UpdateTrulloCardDto,
   ): Promise<Card> {
     return await this.trulloService.updateCard(id, updateTrulloCardDto);
@@ -81,7 +81,7 @@ export class TrulloController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({ status: 204, description: 'Board successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Board not found.' })
-  async deleteBoard(@Param('id', new ParseUUIDPipe()) id: string): Promise<HttpStatus> {
+  async deleteBoard(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<HttpStatus> {
     return await this.trulloService.deleteBoard(id);
   }
 
@@ -90,7 +90,7 @@ export class TrulloController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({ status: 204, description: 'Card successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Card not found.' })
-  async deleteCard(@Param('id', new ParseUUIDPipe()) id: string): Promise<HttpStatus> {
+  async deleteCard(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<HttpStatus> {
     return await this.trulloService.deleteCard(id);
   }
 
