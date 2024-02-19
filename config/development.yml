@@ -4,4 +4,4 @@ db:
 jwt:
   secret: SuperSecret
   # expiresIn: 604800
-  expiresIn: 120
+  expiresIn: 2592000
