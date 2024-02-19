@@ -19,3 +19,7 @@ jwt:
   secret: secret
   expiresIn: 2592000
   defaultStrategy: jwt
+
+rateLimiter:
+  ttl: 5000
+  limit: 10
