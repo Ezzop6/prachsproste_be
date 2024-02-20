@@ -40,6 +40,7 @@ export class TrulloController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a board by id' })
   @ApiResponse({ status: 200, description: 'Board successfully found.', type: SchemaBoard })
+  @ApiResponse({ status: 404, description: 'Board not found.' })
   async findOneBoard(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<Board> {
     return await this.trulloService.findOneBoard(id);
   }
@@ -47,12 +48,14 @@ export class TrulloController {
   @Get('tag/:id')
   @ApiOperation({ summary: 'Get a tag by id' })
   @ApiResponse({ status: 200, description: 'Tag successfully found.', type: TagSchema })
+  @ApiResponse({ status: 404, description: 'Tag not found.' })
   async findOneTag(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<Tag> {
     return await this.trulloService.findOneTag(id);
   }
   @Get('label/:id')
   @ApiOperation({ summary: 'Get a label by id' })
   @ApiResponse({ status: 200, description: 'Label successfully found.' })
+  @ApiResponse({ status: 404, description: 'Label not found.' })
   async findOneLabel(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<Label> {
     return await this.trulloService.findOneLabel(id);
   }
@@ -60,6 +63,7 @@ export class TrulloController {
   @Get('card/:id')
   @ApiOperation({ summary: 'Get a card by id' })
   @ApiResponse({ status: 200, description: 'Card successfully found.', type: SchemaCard })
+  @ApiResponse({ status: 404, description: 'Card not found.' })
   async findOneCard(@Param('id', new ParseUUIDPipe()) id: UUID): Promise<Card> {
     return await this.trulloService.findOneCard(id);
   }
@@ -67,6 +71,7 @@ export class TrulloController {
   @Post('board/:id')
   @ApiOperation({ summary: 'Create a new card' })
   @ApiResponse({ status: 201, description: 'Card successfully created.', type: SchemaCard })
+  @ApiResponse({ status: 404, description: 'Board not found.' })
   async createCard(
     @Param('id', new ParseUUIDPipe()) id: UUID,
     @Body() createCardDto: CreateTrulloCardDto,
@@ -76,12 +81,14 @@ export class TrulloController {
   @Post('tag/:id/')
   @ApiOperation({ summary: 'Create a new tag' })
   @ApiResponse({ status: 201, description: 'Tag successfully created.', type: TagSchema })
+  @ApiResponse({ status: 404, description: 'Card not found.' })
   async createTag(@Param('id', new ParseUUIDPipe()) id: UUID, @Body() dto: CreateTrulloTagDto): Promise<Tag> {
     return await this.trulloService.createTag(id, dto);
   }
   @Post('label/:id/')
   @ApiOperation({ summary: 'Create a new label' })
   @ApiResponse({ status: 201, description: 'Label successfully created.' })
+  @ApiResponse({ status: 404, description: 'Card not found.' })
   async createLabel(@Param('id', new ParseUUIDPipe()) id: UUID, @Body() dto: CreateTrulloLabelDto): Promise<Label> {
     return await this.trulloService.createLabel(id, dto);
   }
