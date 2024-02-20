@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinTable } from 'typeorm';
 import { Board } from './trullo-board.entity';
 import { UUID } from 'crypto';
+import { Tag } from './trullo-tag.entity';
+import { Label } from './trullo-label.entity';
 
 @Entity()
 export class Card {
@@ -15,4 +17,12 @@ export class Card {
 
   @Column()
   item: string;
+
+  @OneToMany(() => Tag, (tag) => tag.card, { cascade: true, eager: true })
+  @JoinTable()
+  tags: Tag[];
+
+  @OneToMany(() => Label, (color) => color.card, { cascade: true, eager: true })
+  @JoinTable()
+  labels: Label[];
 }

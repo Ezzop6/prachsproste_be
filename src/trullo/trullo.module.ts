@@ -6,10 +6,10 @@ import { Trullo } from './entities/trullo.entity';
 import { Board } from './entities/trullo-board.entity';
 import { Card } from './entities/trullo-card.entity';
 import { Tag } from './entities/trullo-tag.entity';
-import { Color } from './entities/trullo-color.entity';
+import { Label } from './entities/trullo-label.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Trullo, Board, Card, Tag, Color])],
+  imports: [TypeOrmModule.forFeature([Trullo, Board, Card, Tag, Label])],
   controllers: [TrulloController],
   providers: [TrulloService],
 })

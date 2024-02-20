@@ -1,14 +1,14 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UUID } from 'crypto';
-import { Board } from './trullo-board.entity';
+import { Card } from './trullo-card.entity';
 
 @Entity()
-export class Color {
+export class Label {
   @PrimaryGeneratedColumn('uuid')
   id: UUID;
 
-  @ManyToOne(() => Board, (board) => board.colors)
-  board: Board;
+  @ManyToOne(() => Card, (card) => card.labels)
+  card: Card;
 
   @Column()
   color: string;

@@ -10,7 +10,7 @@ import { CreateTrulloCardDto } from './dto/create-trullo-card.dto';
 import { UpdateTrulloCardDto } from './dto/update-trullo-card.dto';
 import { UUID } from 'crypto';
 import { Tag } from './entities/trullo-tag.entity';
-import { Color } from './entities/trullo-color.entity';
+import { Label } from './entities/trullo-label.entity';
 
 @Injectable()
 export class TrulloService {
@@ -27,9 +27,11 @@ export class TrulloService {
     @InjectRepository(Tag)
     private readonly tagRepository: Repository<Tag>,
 
-    @InjectRepository(Color)
-    private readonly colorRepository: Repository<Color>,
+    @InjectRepository(Label)
+    private readonly colorRepository: Repository<Label>,
   ) {}
+
+  // CREATE METHODS
 
   async createBoard(createTrulloDto: CreateTrulloBoardDto): Promise<Board> {
     const board = this.boardRepository.create(createTrulloDto);
@@ -39,10 +41,11 @@ export class TrulloService {
   async createCard(id: UUID, createTrulloDto: CreateTrulloCardDto): Promise<Card> {
     const board = await this.findOneBoard(id);
     const card = this.cardRepository.create(createTrulloDto);
-    board.cards.push(card);
-    await this.boardRepository.save(board);
+    card.board = board;
+    await this.cardRepository.save(card);
     return card;
   }
+  // READ METHODS
 
   async findAllBoards(): Promise<Board[]> {
     const boards = await this.boardRepository.find({ relations: ['cards'] });
@@ -68,6 +71,8 @@ export class TrulloService {
     return find;
   }
 
+  // UPDATE METHODS
+
   async updateBoard(id: UUID, updateTrulloBoardDto: UpdateTrulloBoardDto): Promise<Board> {
     const board = await this.findOneBoard(id);
     const updatedBoard = Object.assign(board, updateTrulloBoardDto);
@@ -76,9 +81,27 @@ export class TrulloService {
 
   async updateCard(id: UUID, updateTrulloDto: UpdateTrulloCardDto): Promise<Card> {
     const card = await this.findOneCard(id);
-    const updatedCard = Object.assign(card, updateTrulloDto);
-    return await this.cardRepository.save(updatedCard);
+    console.log('dto', updateTrulloDto);
+
+    const tags = updateTrulloDto.tags
+      ? await Promise.all(updateTrulloDto.tags.map((tag) => this.tagRepository.create({ text: tag })))
+      : [];
+
+    const labels = updateTrulloDto.labels
+      ? await Promise.all(updateTrulloDto.labels.map((label) => this.colorRepository.create({ color: label })))
+      : [];
+
+    const updatedCard = Object.assign(card, { tags }, { labels });
+    console.log('updated', updatedCard);
+
+    await this.cardRepository.save(updatedCard);
+    const find = await this.cardRepository.findOne({ where: { id }, relations: ['tags', 'labels'] });
+    console.log('find', find);
+
+    return find;
   }
+
+  // DELETE METHODS
 
   async deleteBoard(id: UUID): Promise<HttpStatus> {
     const board = await this.findOneBoard(id);
@@ -90,6 +113,7 @@ export class TrulloService {
     }
     return HttpStatus.NO_CONTENT;
   }
+
   async deleteCard(id: UUID): Promise<HttpStatus> {
     const card = await this.findOneCard(id);
     const deleted = await this.cardRepository.remove(card);
@@ -108,6 +132,8 @@ export class TrulloService {
     }
     return HttpStatus.NO_CONTENT;
   }
+
+  // UTILS
 
   sortBoardByDate(boards: Board[], ascending: boolean = true): Board[] {
     return boards.sort((a, b) => {
