@@ -9,6 +9,8 @@ import { Card } from './entities/trullo-card.entity';
 import { CreateTrulloCardDto } from './dto/create-trullo-card.dto';
 import { UpdateTrulloCardDto } from './dto/update-trullo-card.dto';
 import { UUID } from 'crypto';
+import { Tag } from './entities/trullo-tag.entity';
+import { Color } from './entities/trullo-color.entity';
 
 @Injectable()
 export class TrulloService {
@@ -21,6 +23,12 @@ export class TrulloService {
 
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
+
+    @InjectRepository(Tag)
+    private readonly tagRepository: Repository<Tag>,
+
+    @InjectRepository(Color)
+    private readonly colorRepository: Repository<Color>,
   ) {}
 
   async createBoard(createTrulloDto: CreateTrulloBoardDto): Promise<Board> {

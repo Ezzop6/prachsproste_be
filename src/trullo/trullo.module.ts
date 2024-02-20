@@ -5,9 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Trullo } from './entities/trullo.entity';
 import { Board } from './entities/trullo-board.entity';
 import { Card } from './entities/trullo-card.entity';
+import { Tag } from './entities/trullo-tag.entity';
+import { Color } from './entities/trullo-color.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Trullo, Board, Card])],
+  imports: [TypeOrmModule.forFeature([Trullo, Board, Card, Tag, Color])],
   controllers: [TrulloController],
   providers: [TrulloService],
 })
