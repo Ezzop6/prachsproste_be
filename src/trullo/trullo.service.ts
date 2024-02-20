@@ -11,6 +11,10 @@ import { UpdateTrulloCardDto } from './dto/update-trullo-card.dto';
 import { UUID } from 'crypto';
 import { Tag } from './entities/trullo-tag.entity';
 import { Label } from './entities/trullo-label.entity';
+import { CreateTrulloTagDto } from './dto/create-trullo-tag.dto';
+import { CreateTrulloLabelDto } from './dto/create-trullo-label.dto';
+import { UpdateTrulloTagDto } from './dto/update-trullotag.dto';
+import { UpdateTrulloLabelDto } from './dto/update-trullo-label.dto';
 
 @Injectable()
 export class TrulloService {
@@ -45,6 +49,24 @@ export class TrulloService {
     await this.cardRepository.save(card);
     return card;
   }
+
+  async createTag(id: UUID, dto: CreateTrulloTagDto): Promise<Tag> {
+    const card = await this.findOneCard(id);
+    const newTag = new Tag();
+    newTag.text = dto.text;
+    newTag.card = card;
+    await this.tagRepository.save(newTag);
+    return this.tagRepository.findOne({ where: { id: newTag.id } });
+  }
+
+  async createLabel(id: UUID, dto: CreateTrulloLabelDto): Promise<Label> {
+    const card = await this.findOneCard(id);
+    const newLabel = new Label();
+    newLabel.color = dto.color;
+    newLabel.card = card;
+    await this.colorRepository.save(newLabel);
+    return this.colorRepository.findOne({ where: { id: newLabel.id } });
+  }
   // READ METHODS
 
   async findAllBoards(): Promise<Board[]> {
@@ -61,6 +83,21 @@ export class TrulloService {
     }
     const sortedCards = this.sortCardByDate(find.cards);
     return { ...find, cards: sortedCards };
+  }
+
+  async findOneTag(id: UUID): Promise<Tag> {
+    const find = await this.tagRepository.findOne({ where: { id } });
+    if (!find) {
+      throw new NotFoundException(`Tag with id ${id} not found`);
+    }
+    return find;
+  }
+  async findOneLabel(id: UUID): Promise<Label> {
+    const find = await this.colorRepository.findOne({ where: { id } });
+    if (!find) {
+      throw new NotFoundException(`Label with id ${id} not found`);
+    }
+    return find;
   }
 
   async findOneCard(id: UUID): Promise<Card> {
@@ -81,24 +118,29 @@ export class TrulloService {
 
   async updateCard(id: UUID, updateTrulloDto: UpdateTrulloCardDto): Promise<Card> {
     const card = await this.findOneCard(id);
-    console.log('dto', updateTrulloDto);
-
     const tags = updateTrulloDto.tags
       ? await Promise.all(updateTrulloDto.tags.map((tag) => this.tagRepository.create({ text: tag })))
-      : [];
-
+      : card.tags;
     const labels = updateTrulloDto.labels
       ? await Promise.all(updateTrulloDto.labels.map((label) => this.colorRepository.create({ color: label })))
-      : [];
+      : card.labels;
 
     const updatedCard = Object.assign(card, { tags }, { labels });
-    console.log('updated', updatedCard);
-
     await this.cardRepository.save(updatedCard);
+
     const find = await this.cardRepository.findOne({ where: { id }, relations: ['tags', 'labels'] });
-    console.log('find', find);
 
     return find;
+  }
+  async updateTag(id: UUID, dto: UpdateTrulloTagDto): Promise<Tag> {
+    const tag = await this.findOneTag(id);
+    const updatedTag = Object.assign(tag, dto);
+    return await this.tagRepository.save(updatedTag);
+  }
+  async updateLabel(id: UUID, dto: UpdateTrulloLabelDto): Promise<Label> {
+    const label = await this.findOneLabel(id);
+    const updatedLabel = Object.assign(label, dto);
+    return await this.colorRepository.save(updatedLabel);
   }
 
   // DELETE METHODS
@@ -120,6 +162,26 @@ export class TrulloService {
 
     if (!deleted) {
       throw new NotFoundException(`Card with id ${id} not found`);
+    }
+    return HttpStatus.NO_CONTENT;
+  }
+
+  async deleteTag(id: UUID): Promise<HttpStatus> {
+    const tag = await this.findOneTag(id);
+    const deleted = await this.tagRepository.remove(tag);
+
+    if (!deleted) {
+      throw new NotFoundException(`Tag with id ${id} not found`);
+    }
+    return HttpStatus.NO_CONTENT;
+  }
+
+  async deleteLabel(id: UUID): Promise<HttpStatus> {
+    const label = await this.findOneLabel(id);
+    const deleted = await this.colorRepository.remove(label);
+
+    if (!deleted) {
+      throw new NotFoundException(`Label with id ${id} not found`);
     }
     return HttpStatus.NO_CONTENT;
   }
