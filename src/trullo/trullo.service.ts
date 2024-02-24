@@ -39,7 +39,9 @@ export class TrulloService {
 
   async createBoard(createTrulloDto: CreateTrulloBoardDto): Promise<Board> {
     const board = this.boardRepository.create(createTrulloDto);
-    return await this.boardRepository.save(board);
+    await this.boardRepository.save(board);
+    board.cards = [];
+    return board;
   }
 
   async createCard(id: UUID, createTrulloDto: CreateTrulloCardDto): Promise<Card> {
