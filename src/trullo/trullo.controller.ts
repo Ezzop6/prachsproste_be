@@ -69,7 +69,7 @@ export class TrulloController {
   }
 
   @Post('board/:id')
-  @ApiOperation({ summary: 'Create a new card' })
+  @ApiOperation({ summary: 'Create a new card in a board' })
   @ApiResponse({ status: 201, description: 'Card successfully created.', type: SchemaCard })
   @ApiResponse({ status: 404, description: 'Board not found.' })
   async createCard(
@@ -79,14 +79,14 @@ export class TrulloController {
     return await this.trulloService.createCard(id, createCardDto);
   }
   @Post('tag/:id/')
-  @ApiOperation({ summary: 'Create a new tag' })
+  @ApiOperation({ summary: 'Create a new tag in a card' })
   @ApiResponse({ status: 201, description: 'Tag successfully created.', type: TagSchema })
   @ApiResponse({ status: 404, description: 'Card not found.' })
   async createTag(@Param('id', new ParseUUIDPipe()) id: UUID, @Body() dto: CreateTrulloTagDto): Promise<Tag> {
     return await this.trulloService.createTag(id, dto);
   }
   @Post('label/:id/')
-  @ApiOperation({ summary: 'Create a new label' })
+  @ApiOperation({ summary: 'Create a new label in a card' })
   @ApiResponse({ status: 201, description: 'Label successfully created.' })
   @ApiResponse({ status: 404, description: 'Card not found.' })
   async createLabel(@Param('id', new ParseUUIDPipe()) id: UUID, @Body() dto: CreateTrulloLabelDto): Promise<Label> {
@@ -94,7 +94,7 @@ export class TrulloController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a board' })
+  @ApiOperation({ summary: 'Update a board name' })
   @ApiResponse({ status: 200, description: 'Board successfully updated.', type: SchemaBoard })
   @ApiResponse({ status: 404, description: 'Board not found.' })
   async updateBoard(

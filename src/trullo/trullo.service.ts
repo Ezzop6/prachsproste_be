@@ -47,6 +47,7 @@ export class TrulloService {
     const card = this.cardRepository.create(createTrulloDto);
     card.board = board;
     await this.cardRepository.save(card);
+    delete card.board;
     return card;
   }
 
@@ -118,20 +119,10 @@ export class TrulloService {
 
   async updateCard(id: UUID, updateTrulloDto: UpdateTrulloCardDto): Promise<Card> {
     const card = await this.findOneCard(id);
-    const tags = updateTrulloDto.tags
-      ? await Promise.all(updateTrulloDto.tags.map((tag) => this.tagRepository.create({ text: tag })))
-      : card.tags;
-    const labels = updateTrulloDto.labels
-      ? await Promise.all(updateTrulloDto.labels.map((label) => this.colorRepository.create({ color: label })))
-      : card.labels;
-
-    const updatedCard = Object.assign(card, { tags }, { labels });
-    await this.cardRepository.save(updatedCard);
-
-    const find = await this.cardRepository.findOne({ where: { id }, relations: ['tags', 'labels'] });
-
-    return find;
+    const updatedCard = Object.assign(card, updateTrulloDto);
+    return await this.cardRepository.save(updatedCard);
   }
+
   async updateTag(id: UUID, dto: UpdateTrulloTagDto): Promise<Tag> {
     const tag = await this.findOneTag(id);
     const updatedTag = Object.assign(tag, dto);
@@ -147,7 +138,14 @@ export class TrulloService {
 
   async deleteBoard(id: UUID): Promise<HttpStatus> {
     const board = await this.findOneBoard(id);
-    await this.cardRepository.remove(board.cards);
+    const cards = await this.cardRepository.find({ where: { board: { id } } });
+    const tags = await this.tagRepository.find({ where: { card: { board: { id } } } });
+    const labels = await this.colorRepository.find({ where: { card: { board: { id } } } });
+
+    await this.tagRepository.remove(tags);
+    await this.colorRepository.remove(labels);
+    await this.cardRepository.remove(cards);
+
     const deleted = await this.boardRepository.remove(board);
 
     if (!deleted) {
@@ -158,6 +156,12 @@ export class TrulloService {
 
   async deleteCard(id: UUID): Promise<HttpStatus> {
     const card = await this.findOneCard(id);
+    const tags = await this.tagRepository.find({ where: { card: { id } } });
+    const labels = await this.colorRepository.find({ where: { card: { id } } });
+
+    await this.tagRepository.remove(tags);
+    await this.colorRepository.remove(labels);
+
     const deleted = await this.cardRepository.remove(card);
 
     if (!deleted) {
